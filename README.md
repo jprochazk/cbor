@@ -2,7 +2,6 @@
 
 JavaScript implementation of the CBOR [RFC 7049](https://tools.ietf.org/html/rfc7049).
 
-[![npm (scoped)](https://img.shields.io/npm/v/@jprochazk/cbor)](https://www.npmjs.com/package/@jprochazk/cbor)
 ![David](https://img.shields.io/david/dev/jprochazk/cbor)
 ![GitHub](https://img.shields.io/github/license/jprochazk/cbor)
 
