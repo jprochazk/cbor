@@ -8,7 +8,9 @@ window.TextDecoder = TextDecoder;
 window.TextEncoder = TextEncoder;
 import { CBOR } from './../src/index';
 
-const cases = [
+// TODO: write error cases
+
+const valid_cases = [
     ["PositiveIntegerFix 0", [0], 0],
     ["PositiveIntegerFix 1", [1], 1],
     ["PositiveIntegerFix 10", [10], 10],
@@ -18,12 +20,6 @@ const cases = [
     ["PositiveInteger8 100", [24, 100], 100],
     ["PositiveInteger16 1000", [25, 3, 232], 1000],
     ["PositiveInteger32 1000000", [26, 0, 15, 66, 64], 1000000],
-    ["PositiveInteger64 1000000000000", [27, 0, 0, 0, 232, 212, 165, 16, 0], 1000000000000],
-    ["PositiveInteger64 9007199254740991", [27, 0, 31, 255, 255, 255, 255, 255, 255], 9007199254740991],
-    //@ts-ignore
-    ["PositiveInteger64 9007199254740992", [27, 0, 32, 0, 0, 0, 0, 0, 0], BigInt("9007199254740992")],
-    //@ts-ignore
-    ["PositiveInteger64 18446744073709551615", [27, 255, 255, 255, 255, 255, 255, 255, 255], BigInt("18446744073709551615")],
     ["NegativeIntegerFix -1", [32], -1],
     ["NegativeIntegerFix -10", [41], -10],
     ["NegativeIntegerFix -24", [55], -24],
@@ -32,12 +28,6 @@ const cases = [
     ["NegativeInteger8 -100", [56, 99], -100],
     ["NegativeInteger16 -1000", [57, 3, 231], -1000],
     ["NegativeInteger32 -1000000", [58, 0, 15, 66, 63], -1000000],
-    ["NegativeInteger64 -1000000000000", [59, 0, 0, 0, 232, 212, 165, 15, 255], -1000000000000],
-    ["NegativeInteger64 -9007199254740991", [59, 0, 31, 255, 255, 255, 255, 255, 254], -9007199254740991],
-    //@ts-ignore
-    ["NegativeInteger64 -9007199254740992", [59, 0, 31, 255, 255, 255, 255, 255, 255], -BigInt("9007199254740992")],
-    //@ts-ignore
-    ["NegativeInteger64 -18446744073709551616", [59, 255, 255, 255, 255, 255, 255, 255, 255], -BigInt("18446744073709551616")],
     ["String ''", [96], ''],
     ["String 'a'", [97, 97], "a"],
     ["String 'IETF'", [100, 73, 69, 84, 70], "IETF"],
@@ -84,7 +74,7 @@ const cases = [
 ];
 
 describe("CBOR", function () {
-    cases.forEach(c => {
+    valid_cases.forEach(c => {
         const bytes = new Uint8Array(c[1] as number[]).buffer;
         const json = c[2];
         it(`decode ${c[0]}`, function () {
@@ -96,4 +86,5 @@ describe("CBOR", function () {
             });
         }
     });
+
 });

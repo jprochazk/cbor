@@ -1,249 +1,21 @@
-// Copyright (C) 2020 Jan Procházka. 
+// Copyright (C) 2020 Jan Procházka.
 // This code is licensed under the MIT license. (see LICENSE for more details)
 
-import { View } from './view'
-
-/**
- * Decodes a CBOR object into JSON
- * 
- * If `allowErrors` is false (default), the parser will return null 
- * when faced with a parse error instead of throwing the error.
- */
-export function decode(data: ArrayBuffer, allowErrors = false) {
-    if (!allowErrors) {
-        try {
-            return new Parser(new View(data)).parse();
-        } catch (error) {
-            return null;
-        }
-    } else {
-        return new Parser(new View(data)).parse();
-    }
-}
-
-enum ErrorCode {
-    UNEXPECTED_EOF = 0,
-    REACHED_MAX_NESTING_DEPTH,
-    EMPTY_STACK,
-    UNEXPECTED_OBJECT_END,
-    UNEXPECTED_ARRAY_END,
-    UNSUPPORTED_BYTE_STRING,
-    WRONG_STRING_FORMAT,
-    UNSUPPORTED_HALF,
-    UNEXPECTED_TOKEN,
-    UNEXPECTED_VALUE
-}
-export class ParseError extends Error {
-
-    private constructor(private what: string) {
-        super(what);
-
-    }
-
-    public toString() {
-        return `ParseError: ${this.what}`;
-    }
-
-    public static build(code: ErrorCode, info?: { [index: string]: any }) {
-        switch (code) {
-            case ErrorCode.UNEXPECTED_EOF:
-                return new ParseError(`Unexpected EOF at offset ${(info) ? "" : info!.offset}`);
-            case ErrorCode.REACHED_MAX_NESTING_DEPTH:
-                return new ParseError(`Max recursion depth reached: ${(info) ? "" : info!.depth}`);
-            case ErrorCode.EMPTY_STACK:
-                return new ParseError(`Unexpected value before the start of an object or array`);
-            case ErrorCode.UNEXPECTED_OBJECT_END:
-                return new ParseError(`Unexpected end of object before the start of an object`);
-            case ErrorCode.UNEXPECTED_ARRAY_END:
-                return new ParseError(`Unexpected end of array before the start of an array`);
-            case ErrorCode.UNSUPPORTED_BYTE_STRING:
-                return new ParseError(`byte strings are unsupported`);
-            case ErrorCode.WRONG_STRING_FORMAT:
-                return new ParseError(`Expected string length value range 0x60 to 0x7F, found: ${info!.token}`);
-            case ErrorCode.UNSUPPORTED_HALF:
-                return new ParseError(`Half (IEEE754 binary16) is unsupported`);
-            case ErrorCode.UNEXPECTED_TOKEN:
-                return new ParseError(`Unexpected token: ${info!.token}`);
-            case ErrorCode.UNEXPECTED_VALUE:
-                return new ParseError(`Found value before key in object`);
-            default:
-                return new ParseError(`Unknown error code`);
-        }
-    }
-}
-
-class StackRef {
-    constructor(
-        private type: "object" | "array",
-        private value: any
-    ) { }
-
-    isArray(): boolean {
-        return this.type === "array";
-    }
-
-    isObject(): boolean {
-        return !this.isArray();
-    }
-
-    array(): any[] {
-        return this.value as any[];
-    }
-
-    object(): { [index: string]: any } {
-        return this.value as { [index: string]: any };
-    }
-}
-
-class Stack {
-    private stack: StackRef[] = [];
-
-    get length(): number {
-        return this.stack.length;
-    }
-
-    push(type: "object" | "array", value: any) {
-        this.stack.push(new StackRef(type, value));
-    }
-
-    pop() {
-        return this.stack.pop();
-    }
-
-    last() {
-        return this.stack[this.stack.length - 1];
-    }
-
-    empty() {
-        return this.stack.length === 0;
-    }
-}
-
-class JsonSax {
-    /**
-     * The root element
-     */
-    private root: any = null;
-    /**
-     * Stack of objects or arrays 
-     */
-    private stack: Stack = new Stack();
-    /**
-     * Next element if the stack has an object at the top
-     */
-    private last_key: string | null = null;
-
-    constructor(
-        private readonly max_depth: number
-    ) {
-
-    }
-
-    null(): null {
-        return this.handle(null);
-    }
-
-    undefined(): undefined {
-        return this.handle(undefined);
-    }
-
-    boolean(value: boolean): boolean {
-        return this.handle(value);
-    }
-
-    number(value: number): number {
-        return this.handle(value);
-    }
-
-    string(value: string): string {
-        return this.handle(value);
-    }
-
-    begin_object() {
-        this.stack.push("object", this.handle({}));
-
-        if (this.stack.length > this.max_depth) {
-            throw ParseError.build(ErrorCode.REACHED_MAX_NESTING_DEPTH, { depth: this.max_depth });
-        }
-    }
-
-    key(value: string) {
-        const stack_top = this.stack.last();
-        if (!stack_top) {
-            throw ParseError.build(ErrorCode.EMPTY_STACK);
-        }
-
-        stack_top.object()[value] = null;
-        this.last_key = value;
-    }
-
-    end_object() {
-        if (this.stack.empty() || !this.stack.last().isObject()) {
-            throw ParseError.build(ErrorCode.UNEXPECTED_OBJECT_END);
-        }
-
-        return this.stack.pop()!.object();
-    }
-
-    begin_array() {
-        this.stack.push("array", this.handle([]));
-
-        if (this.stack.length > this.max_depth) {
-            throw ParseError.build(ErrorCode.REACHED_MAX_NESTING_DEPTH, { depth: this.max_depth });
-        }
-    }
-
-    end_array() {
-        if (this.stack.empty() || !this.stack.last().isArray()) {
-            throw ParseError.build(ErrorCode.UNEXPECTED_ARRAY_END);
-        }
-
-        return this.stack.pop()!.array();
-    }
-
-    private handle(value: any): any {
-        if (this.stack.length === 0 && this.root === null) {
-            this.root = value;
-            return value;
-        }
-
-        const stack_top = this.stack.last();
-        if (stack_top.isArray()) {
-            stack_top.array().push(value);
-            return value;
-        }
-        else if (stack_top.isObject()) {
-            if (!this.last_key) throw ParseError.build(ErrorCode.UNEXPECTED_VALUE);
-            stack_top.object()[this.last_key] = value;
-            return value;
-        }
-    }
-}
+import { View } from 'common/view'
+import { ErrorCode, ParseError } from './error'
+import { SAX } from './sax'
 
 const INFO_MASK = 0b00011111;
 const TEXT_DECODER = new TextDecoder();
 
-function add_number_bigint(a: number, b: number | bigint): number | bigint {
-    if (typeof b === 'bigint') {
-        return BigInt(a) + b;
-    } else {
-        const result = a + b;
-        if (-Number.MAX_SAFE_INTEGER <= result && result <= Number.MAX_SAFE_INTEGER) {
-            return result;
-        } else {
-            return BigInt(result);
-        }
-    }
-}
-
-class Parser {
+export class Parser {
     private current_value: any;
-    private readonly sax: JsonSax;
+    private readonly sax: SAX;
     constructor(
         private readonly view: View,
         max_depth = 100
     ) {
-        this.sax = new JsonSax(max_depth);
+        this.sax = new SAX(max_depth);
     }
 
     public parse() {
@@ -260,7 +32,8 @@ class Parser {
             case (this.current_value === 0x1A):
                 return this.sax.number(this.view.getUint32());
             case (this.current_value === 0x1B):
-                return this.sax.number((this.view.getUint64()) as unknown as number)
+                throw ParseError.build(ErrorCode.UNSUPPORTED_64_BIT);
+            //return this.sax.number((this.view.getUint64()) as unknown as number)
             case (this.current_value <= 0x37):
                 return this.sax.number(-(1 + (this.current_value & INFO_MASK)));
             case (this.current_value === 0x38):
@@ -270,7 +43,8 @@ class Parser {
             case (this.current_value === 0x3A):
                 return this.sax.number(-(1 + this.view.getUint32()));
             case (this.current_value === 0x3B):
-                return this.sax.number(-(add_number_bigint(1, this.view.getUint64())) as unknown as number)
+                throw ParseError.build(ErrorCode.UNSUPPORTED_64_BIT);
+            //return this.sax.number(-(add_number_bigint(1, this.view.getUint64())) as unknown as number)
             case (this.current_value <= 0x5F):
                 throw ParseError.build(ErrorCode.UNSUPPORTED_BYTE_STRING);
             case (this.current_value <= 0x7F):

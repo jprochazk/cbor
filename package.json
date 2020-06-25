@@ -6,7 +6,7 @@
         "cbor",
         "sax"
     ],
-    "main": "src/index.ts",
+    "main": "build/index.js",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/jprochazk/cbor.git"
@@ -17,7 +17,8 @@
         "url": "https://github.com/jprochazk/cbor/issues"
     },
     "scripts": {
-        "test": "jest"
+        "test": "jest",
+        "build": "webpack --config webpack.prod.js"
     },
     "devDependencies": {
         "@types/jest": "^25.2.1",

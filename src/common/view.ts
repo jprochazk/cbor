@@ -13,18 +13,6 @@ export class OutOfBoundsError extends Error {
     }
 }
 
-export class Unsupported64BitError extends Error {
-    private what: string;
-    constructor() {
-        super(`64-bit types are unsupported in this browser!`);
-        this.what = `64-bit types are unsupported in this browser!`;
-    }
-
-    toString() {
-        return `Unsupported64BitError: ${this.what}`;
-    }
-}
-
 export class View {
     private view: DataView;
     private arrayView: Uint8Array;
@@ -34,15 +22,6 @@ export class View {
     ) {
         this.view = new DataView(this.buffer, 0, this.buffer.byteLength);
         this.arrayView = new Uint8Array(this.buffer);
-
-        if (undefined === window.BigInt) {
-            this.getUint64 = () => {
-                throw new Unsupported64BitError();
-            }
-            this.getInt64 = () => {
-                throw new Unsupported64BitError();
-            }
-        }
     }
 
     public getFloat32(): number {
@@ -75,12 +54,11 @@ export class View {
             throw new OutOfBoundsError(this.offset, this.arrayView.byteLength);
         return this.view.getInt32(this.offset - 4, false);
     }
-    public getInt64(): number | bigint {
+    public getInt64(): bigint {
         this.offset += 8;
         if (this.offset > this.arrayView.byteLength)
             throw new OutOfBoundsError(this.offset, this.arrayView.byteLength);
-        const output = this.view.getBigInt64(this.offset - 8, false);
-        return output <= Number.MAX_SAFE_INTEGER ? Number(output) : output;
+        return this.view.getBigInt64(this.offset - 8, false);
     }
     public getUint8(): number {
         this.offset += 1;
@@ -104,8 +82,7 @@ export class View {
         this.offset += 8;
         if (this.offset > this.arrayView.byteLength)
             throw new OutOfBoundsError(this.offset, this.arrayView.byteLength);
-        const output = this.view.getBigUint64(this.offset - 8, false);
-        return -Number.MAX_SAFE_INTEGER <= output && output <= Number.MAX_SAFE_INTEGER ? Number(output) : output;
+        return this.view.getBigUint64(this.offset - 8, false);
     }
     public getBytes(length: number): Uint8Array {
         this.offset += length;
