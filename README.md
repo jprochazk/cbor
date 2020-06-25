@@ -1,6 +1,12 @@
 # cbor
 
-JavaScript implementation of the CBOR [RFC 7049](https://tools.ietf.org/html/rfc7049). Decoding is implemented as a [SAX](https://en.wikipedia.org/wiki/Simple_API_for_XML) parser.
+=======
+
+JavaScript implementation of the CBOR [RFC 7049](https://tools.ietf.org/html/rfc7049).
+
+![npm (scoped)](https://img.shields.io/npm/v/@edjaypr/cbor)
+![David](https://img.shields.io/david/dev/jprochazk/cbor)
+![GitHub](https://img.shields.io/github/license/jprochazk/cbor)
 
 This library provides the [recommended API](http://cbor.io/impls.html)
 
