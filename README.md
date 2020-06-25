@@ -1,7 +1,5 @@
 # cbor
 
----
-
 JavaScript implementation of the CBOR [RFC 7049](https://tools.ietf.org/html/rfc7049).
 
 ![npm (scoped)](https://img.shields.io/npm/v/@edjaypr/cbor)
