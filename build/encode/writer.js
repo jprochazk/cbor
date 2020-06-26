@@ -1,42 +1,30 @@
 // Copyright (C) 2020 Jan Procházka.
 // This code is licensed under the MIT license. (see LICENSE for more details)
-
-import { View } from '../common/view'
-import { getType, NUMERIC_LIMITS } from './util'
+import { View } from '../common/view';
+import { getType, NUMERIC_LIMITS } from './util';
 import { WriteError, ErrorCode } from './error';
-
 const TEXT_ENCODER = new TextEncoder();
-
 export class Writer {
-    private view: View
-
-    constructor(
-        buffer: ArrayBuffer
-    ) {
+    constructor(buffer) {
         this.view = new View(buffer);
     }
-
-    finalize(): ArrayBuffer {
+    finalize() {
         return this.view.slice(0, this.view.offset);
     }
-
-    write(value: any) {
+    write(value) {
         switch (getType(value)) {
             case "undefined": {
                 this.view.setUint8(0xF7);
                 break;
             }
-
             case "null": {
                 this.view.setUint8(0xF6);
                 break;
             }
-
             case "boolean": {
                 this.view.setUint8(value ? 0xF5 : 0xF4);
                 break;
             }
-
             case "number": {
                 if (!Number.isSafeInteger(value)) {
                     // NaN / Infinity / -Infinity are encoded as Float32
@@ -44,11 +32,13 @@ export class Writer {
                     if (isNaN(value) || !isFinite(value) || (-NUMERIC_LIMITS.FLOAT32 <= value && value <= NUMERIC_LIMITS.FLOAT32)) {
                         this.view.setUint8(0xFA);
                         this.view.setFloat32(value);
-                    } else {
+                    }
+                    else {
                         this.view.setUint8(0xFB);
                         this.view.setFloat64(value);
                     }
-                } else {
+                }
+                else {
                     if (value >= 0) {
                         if (value <= 0x17) {
                             this.view.setUint8(value);
@@ -66,7 +56,7 @@ export class Writer {
                             this.view.setUint32(value);
                         }
                         else {
-                            throw WriteError.build(ErrorCode.NUMBER_TOO_LARGE, { number: value.toString(10) })
+                            throw WriteError.build(ErrorCode.NUMBER_TOO_LARGE, { number: value.toString(10) });
                             /*
                             this.view.setUint8(0x19);
                             this.view.setUint64(value);
@@ -78,22 +68,22 @@ export class Writer {
                         // byte, and the value is converted to a positive number.
                         const positive_number = -1 - value;
                         if (value >= -24) {
-                            this.view.setUint8(0b00100000 + (positive_number as number));
+                            this.view.setUint8(0b00100000 + positive_number);
                         }
                         else if (positive_number <= NUMERIC_LIMITS.UINT8) {
                             this.view.setUint8(0x38);
-                            this.view.setUint8(positive_number as number);
+                            this.view.setUint8(positive_number);
                         }
                         else if (positive_number <= NUMERIC_LIMITS.UINT16) {
                             this.view.setUint8(0x39);
-                            this.view.setUint16(positive_number as number);
+                            this.view.setUint16(positive_number);
                         }
                         else if (positive_number <= NUMERIC_LIMITS.UINT32) {
                             this.view.setUint8(0x3A);
-                            this.view.setUint32(positive_number as number);
+                            this.view.setUint32(positive_number);
                         }
                         else {
-                            throw WriteError.build(ErrorCode.NUMBER_TOO_LARGE, { number: value.toString(10) })
+                            throw WriteError.build(ErrorCode.NUMBER_TOO_LARGE, { number: value.toString(10) });
                             /*
                             this.view.setUint8(0x3B);
                             this.view.setUint64(positive_number as bigint);
@@ -103,7 +93,6 @@ export class Writer {
                 }
                 break;
             }
-
             case "string": {
                 const encoded = TEXT_ENCODER.encode(value);
                 const size = encoded.length;
@@ -129,13 +118,11 @@ export class Writer {
                     this.view.setUint64(BigInt(size));
                     */
                 }
-
                 if (size > 0) {
                     this.view.setBytes(encoded);
                 }
                 break;
             }
-
             case "array": {
                 const size = value.length;
                 if (size <= 0x17) {
@@ -160,13 +147,11 @@ export class Writer {
                     this.view.setUint64(BigInt(size));
                     */
                 }
-
                 for (const item of value) {
                     this.write(item);
                 }
                 break;
             }
-
             case "object": {
                 const size = Object.keys(value).length;
                 if (size <= 0x17) {
@@ -191,14 +176,12 @@ export class Writer {
                     this.view.setUint64(BigInt(size));
                     */
                 }
-
                 for (const [k, v] of Object.entries(value)) {
                     this.write(k);
                     this.write(v);
                 }
                 break;
             }
-
             default:
                 break;
         }

@@ -1,24 +1,15 @@
 // Copyright (C) 2020 Jan Procházka.
 // This code is licensed under the MIT license. (see LICENSE for more details)
-
-import { View } from '../common/view'
-import { ErrorCode, ParseError } from './error'
-import { SAX } from './sax'
-
+import { ErrorCode, ParseError } from './error';
+import { SAX } from './sax';
 const INFO_MASK = 0b00011111;
 const TEXT_DECODER = new TextDecoder();
-
 export class Parser {
-    private current_value: any;
-    private readonly sax: SAX;
-    constructor(
-        private readonly view: View,
-        max_depth = 100
-    ) {
+    constructor(view, max_depth = 100) {
+        this.view = view;
         this.sax = new SAX(max_depth);
     }
-
-    public parse() {
+    parse() {
         // see https://tools.ietf.org/html/rfc7049#appendix-B to understand these values
         this.get();
         switch (true) {
@@ -69,14 +60,12 @@ export class Parser {
                 return this.sax.number(this.view.getFloat64());
         }
     }
-
-    private get(): number {
+    get() {
         this.current_value = this.view.getUint8();
         return this.current_value;
     }
-
-    private get_string(): string {
-        let len: number | bigint = -1;
+    get_string() {
+        let len = -1;
         switch (true) {
             case (this.current_value <= 0x77):
                 len = this.current_value & INFO_MASK;
@@ -97,7 +86,7 @@ export class Parser {
             default:
                 throw ParseError.build(ErrorCode.WRONG_STRING_FORMAT, { token: `0x${this.current_value.toString(16).toUpperCase()}` });
         }
-        const result: string[] = [];
+        const result = [];
         if (len > -1) {
             if (typeof len === "bigint") {
                 const bytes = [];
@@ -105,12 +94,14 @@ export class Parser {
                     bytes.push(this.get());
                 }
                 result.push(TEXT_DECODER.decode(new Uint8Array(bytes)));
-            } else {
+            }
+            else {
                 const bytes = this.view.getBytes(len);
                 if (bytes.length > 0)
                     result.push(TEXT_DECODER.decode(bytes));
             }
-        } else {
+        }
+        else {
             const chunks = [];
             while (this.get() != 0xFF) {
                 chunks.push(this.get_string());
@@ -119,11 +110,9 @@ export class Parser {
         }
         return result.join("");
     }
-
-    private get_array(): any[] {
+    get_array() {
         this.sax.begin_array();
-
-        let len: number | bigint = -1;
+        let len = -1;
         switch (true) {
             case (this.current_value <= 0x97):
                 len = this.current_value & INFO_MASK;
@@ -142,24 +131,23 @@ export class Parser {
                 break;
             case (this.current_value === 0x9F): break;
             default:
-                throw ParseError.build(ErrorCode.UNEXPECTED_TOKEN, { token: `0x${this.current_value.toString(16).toUpperCase()}` })
+                throw ParseError.build(ErrorCode.UNEXPECTED_TOKEN, { token: `0x${this.current_value.toString(16).toUpperCase()}` });
         }
         if (len > -1) {
             for (let i = 0; i < len; i++) {
                 this.parse();
             }
-        } else {
+        }
+        else {
             while (this.current_value !== 0xFF) {
                 this.parse();
             }
         }
         return this.sax.end_array();
     }
-
-    private get_object(): { [index: string]: any } {
+    get_object() {
         this.sax.begin_object();
-
-        let len: number | bigint = -1;
+        let len = -1;
         switch (true) {
             case (this.current_value <= 0xB7):
                 len = this.current_value & INFO_MASK;
@@ -183,7 +171,8 @@ export class Parser {
                 this.sax.key(this.get_string());
                 this.parse();
             }
-        } else {
+        }
+        else {
             while (this.get() != 0xFF) {
                 this.sax.key(this.get_string());
                 this.parse();

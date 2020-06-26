@@ -1,4 +1,4 @@
-import { View } from 'common/view';
+import { View } from '../common/view';
 export declare class Parser {
     private readonly view;
     private current_value;

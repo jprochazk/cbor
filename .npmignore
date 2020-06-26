@@ -4,4 +4,3 @@ src
 .eslintrc.js
 jest.config.js
 tsconfig.json
-webpack.*

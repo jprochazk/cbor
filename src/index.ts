@@ -1,7 +1,7 @@
 // Copyright (C) 2020 Jan Procházka. 
 // This code is licensed under the MIT license. (see LICENSE for more details)
-import { decode } from './decode'
-import { encode } from './encode'
+import { decode } from './decode/index'
+import { encode } from './encode/index'
 
 export class CBOR {
 
