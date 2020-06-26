@@ -8,7 +8,7 @@ JavaScript implementation of the CBOR [RFC 7049](https://tools.ietf.org/html/rfc
 This library provides the [recommended API](http://cbor.io/impls.html)
 
 ```js
-import CBOR from "cbor";
+import CBOR from "@jprochazk/cbor";
 
 const encoded = CBOR.encode(json);
 const decoded = CBOR.decode(encoded);
