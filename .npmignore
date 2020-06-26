@@ -1,5 +1,6 @@
-test
+bench
 src
+test
 .eslintignore
 .eslintrc.js
 jest.config.js
