@@ -1,11 +1,9 @@
 // Copyright (C) 2020 Jan Procházka. 
 // This code is licensed under the MIT license. (see LICENSE for more details)
 
-import { TextDecoder, TextEncoder } from 'util';
-//@ts-ignore
-window.TextDecoder = TextDecoder;
-//@ts-ignore
-window.TextEncoder = TextEncoder;
+//window.TextDecoder = global.TextDecoder;
+//window.TextEncoder = global.TextEncoder;
+
 import { CBOR } from './../src/index';
 
 // TODO: write error cases
