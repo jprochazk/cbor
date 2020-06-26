@@ -1,9 +1,6 @@
 // Copyright (C) 2020 Jan Procházka. 
 // This code is licensed under the MIT license. (see LICENSE for more details)
 
-//window.TextDecoder = global.TextDecoder;
-//window.TextEncoder = global.TextEncoder;
-
 import { CBOR } from './../src/index';
 
 // TODO: write error cases
