@@ -1,6 +1,6 @@
 {
     "name": "@jprochazk/cbor",
-    "version": "0.1.2",
+    "version": "0.1.3",
     "description": "Partial implementation of RFC 7049 (CBOR)",
     "keywords": [
         "cbor",
