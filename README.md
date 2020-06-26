@@ -25,7 +25,3 @@ There are a few things from the specification which are currently unimplemented:
 -   Numbers larger than 32 bit (and BigInt)
 
 These weren't required in my case, but if you need one or more of these features, submit an [issue](https://github.com/jprochazk/cbor/issues), and I'll implement it! :)
-
-### Acknowledgements
-
-The values for the test cases are from https://github.com/paroga/cbor-js/blob/master/test/tests.js. © 2015 Patrick Gansterer, MIT.

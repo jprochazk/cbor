@@ -24,6 +24,10 @@ export class View {
         this.arrayView = new Uint8Array(this.buffer);
     }
 
+    public slice(start: number, end?: number): ArrayBuffer {
+        return this.buffer.slice(start, end);
+    }
+
     public getFloat32(): number {
         this.offset += 4;
         if (this.offset > this.arrayView.byteLength)

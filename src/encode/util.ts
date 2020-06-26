@@ -12,17 +12,10 @@ export const NUMERIC_LIMITS = {
     FLOAT64: Number.MAX_SAFE_INTEGER
 }
 
-export function isFloat(value: any): boolean {
-    return typeof value === "number" // must be a number
-        && (
-            !isFinite(value)    // infinity is always encoded as float32
-            || isNaN(value)     // nan is always encoded as float32
-            || (value >= NUMERIC_LIMITS.UINT32 || value <= -NUMERIC_LIMITS.UINT32)
-        )
-}
-
-export function get_type(value: any): "object" | "array" | "string" | "number" | "boolean" | "null" {
+export function getType(value: any): "object" | "array" | "string" | "number" | "boolean" | "null" | "undefined" {
     switch (true) {
+        case (typeof value === "undefined"):
+            return "undefined";
         case (value === null):
             return "null";
         case (typeof value === "boolean"):
