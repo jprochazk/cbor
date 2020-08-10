@@ -2,8 +2,9 @@
 
 JavaScript implementation of the CBOR [RFC 7049](https://tools.ietf.org/html/rfc7049).
 
-![David](https://img.shields.io/david/dev/jprochazk/cbor)
-![GitHub](https://img.shields.io/github/license/jprochazk/cbor)
+[![Build Status](https://travis-ci.com/jprochazk/cbor.svg?branch=master)](https://travis-ci.com/jprochazk/cbor)
+[![David](https://img.shields.io/david/dev/jprochazk/cbor)](https://github.com/jprochazk/cbor/blob/master/package.json)
+[![GitHub](https://img.shields.io/github/license/jprochazk/cbor)](https://github.com/jprochazk/cbor/blob/master/LICENSE)
 
 ### Usage
 
