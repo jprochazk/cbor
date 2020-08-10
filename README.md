@@ -41,11 +41,12 @@ const encoded = CBOR.encodeInto(data, buffer);
 Speed was one of my main concerns when writing this library. Benchmark is available [here](https://jsbench.me/krkdop8101/1).
 
 
-| CPU      | CBOR.decode   | CBOR.encode   | CBOR.encodeInto |
-| :------- | :------------ | :------------ | :-------------- |
-| i5-8600K | 5225.64 ops/s | 8998.11 ops/s | 9268.09 ops/s   |
+| Browser | CBOR.decode | CBOR.encode | CBOR.encodeInto |
+| :------ | :---------- | :---------- | :-------------- |
+| Chrome  | 5225 ops/s  | 8998 ops/s  | 9268 ops/s      |
+| Firefox | 20454 ops/s | 22323 ops/s | 22900 ops/s     |
 
-The JSON data used in the test is 2 KB decoded and 1.8 KB encoded. This means the library can decode at 13 MB/s and encode at 10 MB/s. 
+Results are on a i5-8600k intel processor. The JSON data used in the test is 2 KB decoded and 1.8 KB encoded. This means the library can decode at 13 MB/s and encode at 10 MB/s. 
 
 You can squeeze out a bit more performance if you use `CBOR.encodeInto` with a sufficiently large buffer. the `CBOR.encode` default is 1024 bytes, which should be enough for the vast majority of uses, but if you ever find yourself using more than that, utilize `CBOR.encodeInto`.
 
