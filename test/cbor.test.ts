@@ -133,7 +133,7 @@ describe("CBOR", function () {
             }
 
             {
-                const encoded = CBOR.encodeInto(json, new ArrayBuffer(bytes.byteLength), true);
+                const encoded = CBOR.encodeInto(new ArrayBuffer(bytes.byteLength), json, true);
                 if (null === encoded) return fail();
 
                 expect(new Uint8Array(encoded))

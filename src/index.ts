@@ -35,7 +35,7 @@ export default class CBOR {
      * @param buffer The buffer to write to
      * @param allowErrors Whether to throw errors (true) or return null on failure (false). False by default
      */
-    static encodeInto(data: any, buffer: ArrayBuffer, allowErrors = false): ArrayBuffer | null {
+    static encodeInto(buffer: ArrayBuffer, data: any, allowErrors = false): ArrayBuffer | null {
         return encode(data, allowErrors, buffer);
     }
 }
