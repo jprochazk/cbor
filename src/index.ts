@@ -39,5 +39,3 @@ export class CBOR {
         return encode(data, allowErrors, buffer);
     }
 }
-
-export default CBOR;

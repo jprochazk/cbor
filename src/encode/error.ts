@@ -1,7 +1,14 @@
 // Copyright (C) 2020 Jan Procházka.
 // This code is licensed under the MIT license. (see LICENSE for more details)
 
-import { NUMERIC_LIMITS } from "./util";
+const NUMERIC_LIMITS = {
+    UINT8: 2 ** 8 - 1,
+    UINT16: 2 ** 16 - 1,
+    UINT32: 2 ** 32 - 1,
+    //UINT64: BigInt("18446744073709552000"),
+    FLOAT32: 2 ** 23 - 1,
+    FLOAT64: Number.MAX_SAFE_INTEGER
+}
 
 export enum ErrorCode {
     UNEXPECTED_TOKEN = 0,
