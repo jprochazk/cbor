@@ -6,7 +6,7 @@
         "cbor",
         "sax"
     ],
-    "main": "build/index.js",
+    "main": "dist/index.js",
     "repository": {
         "type": "git",
         "url": "git+https://github.com/jprochazk/cbor.git"

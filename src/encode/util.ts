@@ -7,29 +7,29 @@ export const NUMERIC_LIMITS = {
     UINT8: 2 ** 8 - 1,
     UINT16: 2 ** 16 - 1,
     UINT32: 2 ** 32 - 1,
-    UINT64: BigInt("18446744073709552000"),
+    //UINT64: BigInt("18446744073709552000"),
     FLOAT32: 2 ** 23 - 1,
     FLOAT64: Number.MAX_SAFE_INTEGER
 }
 
-export function getType(value: any): "object" | "array" | "string" | "number" | "boolean" | "null" | "undefined" {
+export function getType(value: any): number {
     switch (true) {
         case (typeof value === "undefined"):
-            return "undefined";
+            return 0;
         case (value === null):
-            return "null";
+            return 1;
         case (typeof value === "boolean"):
-            return "boolean";
+            return 2;
         case (typeof value === "number"):
-            return "number";
+            return 3;
         case (typeof value === "bigint"):
             throw WriteError.build(ErrorCode.UNSUPPORTED_BIGINT);
         case (typeof value === "string"):
-            return "string";
+            return 4;
         case (Array.isArray(value)):
-            return "array";
+            return 5;
         case (typeof value === "object"):
-            return "object";
+            return 6;
         default:
             throw WriteError.build(ErrorCode.UNEXPECTED_TOKEN, { token: value });
     }

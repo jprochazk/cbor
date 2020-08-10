@@ -5,17 +5,16 @@ import { View } from '../common/view'
 import { ErrorCode, ParseError } from './error'
 import { SAX } from './sax'
 
-const INFO_MASK = 0b00011111;
-const TEXT_DECODER = new TextDecoder();
-
 export class Parser {
     private current_value: any;
     private readonly sax: SAX;
+    private textDecoder: TextDecoder;
     constructor(
         private readonly view: View,
         max_depth = 100
     ) {
         this.sax = new SAX(max_depth);
+        this.textDecoder = new TextDecoder();
     }
 
     public parse() {
@@ -35,7 +34,7 @@ export class Parser {
                 throw ParseError.build(ErrorCode.UNSUPPORTED_64_BIT);
             //return this.sax.number((this.view.getUint64()) as unknown as number)
             case (this.current_value <= 0x37):
-                return this.sax.number(-(1 + (this.current_value & INFO_MASK)));
+                return this.sax.number(-(1 + (this.current_value & 0b00011111)));
             case (this.current_value === 0x38):
                 return this.sax.number(-(1 + this.view.getUint8()));
             case (this.current_value === 0x39):
@@ -79,7 +78,7 @@ export class Parser {
         let len: number | bigint = -1;
         switch (true) {
             case (this.current_value <= 0x77):
-                len = this.current_value & INFO_MASK;
+                len = this.current_value & 0b00011111;
                 break;
             case (this.current_value === 0x78):
                 len = this.view.getUint8();
@@ -104,15 +103,15 @@ export class Parser {
                 for (let i = 0; i < len; i++) {
                     bytes.push(this.get());
                 }
-                result.push(TEXT_DECODER.decode(new Uint8Array(bytes)));
+                result.push(this.textDecoder.decode(new Uint8Array(bytes)));
             } else {
                 const bytes = this.view.getBytes(len);
                 if (bytes.length > 0)
-                    result.push(TEXT_DECODER.decode(bytes));
+                    result.push(this.textDecoder.decode(bytes));
             }
         } else {
             const chunks = [];
-            while (this.get() != 0xFF) {
+            while (this.get() !== 0xFF) {
                 chunks.push(this.get_string());
             }
             result.push(...chunks);
@@ -126,7 +125,7 @@ export class Parser {
         let len: number | bigint = -1;
         switch (true) {
             case (this.current_value <= 0x97):
-                len = this.current_value & INFO_MASK;
+                len = this.current_value & 0b00011111;
                 break;
             case (this.current_value === 0x98):
                 len = this.view.getUint8();
@@ -162,7 +161,7 @@ export class Parser {
         let len: number | bigint = -1;
         switch (true) {
             case (this.current_value <= 0xB7):
-                len = this.current_value & INFO_MASK;
+                len = this.current_value & 0b00011111;
                 break;
             case (this.current_value === 0xB8):
                 len = this.view.getUint8();
@@ -184,7 +183,7 @@ export class Parser {
                 this.parse();
             }
         } else {
-            while (this.get() != 0xFF) {
+            while (this.get() !== 0xFF) {
                 this.sax.key(this.get_string());
                 this.parse();
             }

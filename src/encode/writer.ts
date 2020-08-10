@@ -5,15 +5,15 @@ import { View } from '../common/view'
 import { getType, NUMERIC_LIMITS } from './util'
 import { WriteError, ErrorCode } from './error';
 
-const TEXT_ENCODER = new TextEncoder();
-
 export class Writer {
     private view: View
+    private textEncoder: TextEncoder;
 
     constructor(
         buffer: ArrayBuffer
     ) {
         this.view = new View(buffer);
+        this.textEncoder = new TextEncoder();
     }
 
     finalize(): ArrayBuffer {
@@ -22,22 +22,22 @@ export class Writer {
 
     write(value: any) {
         switch (getType(value)) {
-            case "undefined": {
+            case 0: { // undefined
                 this.view.setUint8(0xF7);
                 break;
             }
 
-            case "null": {
+            case 1: { // null
                 this.view.setUint8(0xF6);
                 break;
             }
 
-            case "boolean": {
+            case 2: { // boolean
                 this.view.setUint8(value ? 0xF5 : 0xF4);
                 break;
             }
 
-            case "number": {
+            case 3: { // number
                 if (!Number.isSafeInteger(value)) {
                     // NaN / Infinity / -Infinity are encoded as Float32
                     // TODO: encode Infinity as Float16 instead (less bytes, same value)
@@ -104,8 +104,8 @@ export class Writer {
                 break;
             }
 
-            case "string": {
-                const encoded = TEXT_ENCODER.encode(value);
+            case 4: { // string
+                const encoded = this.textEncoder.encode(value);
                 const size = encoded.length;
                 if (size <= 0x17) {
                     this.view.setUint8(0x60 + size);
@@ -136,7 +136,7 @@ export class Writer {
                 break;
             }
 
-            case "array": {
+            case 5: { // array
                 const size = value.length;
                 if (size <= 0x17) {
                     this.view.setUint8(0x80 + size);
@@ -167,7 +167,7 @@ export class Writer {
                 break;
             }
 
-            case "object": {
+            case 6: { // object
                 const size = Object.keys(value).length;
                 if (size <= 0x17) {
                     this.view.setUint8(0xA0 + size);

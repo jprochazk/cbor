@@ -8,7 +8,8 @@ import { Parser } from './parser';
  * If `allowErrors` is false (default), the parser will return null
  * when faced with a parse error instead of throwing the error.
  */
-export function decode(data, allowErrors = false) {
+export function decode(data, allowErrors) {
+    if (allowErrors === void 0) { allowErrors = false; }
     if (!allowErrors) {
         try {
             return new Parser(new View(data)).parse();

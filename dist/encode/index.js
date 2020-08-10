@@ -8,8 +8,8 @@ import { Writer } from './writer';
  * when faced with a write error instead of throwing the error.
  */
 export function encode(data, allowErrors, out) {
-    const buffer = out !== null && out !== void 0 ? out : new ArrayBuffer(50);
-    const writer = new Writer(buffer);
+    var buffer = out !== null && out !== void 0 ? out : new ArrayBuffer(50);
+    var writer = new Writer(buffer);
     if (!allowErrors) {
         try {
             writer.write(data);

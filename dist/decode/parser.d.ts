@@ -3,6 +3,7 @@ export declare class Parser {
     private readonly view;
     private current_value;
     private readonly sax;
+    private textDecoder;
     constructor(view: View, max_depth?: number);
     parse(): string | number | boolean | {
         [index: string]: any;

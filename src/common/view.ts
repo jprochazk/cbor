@@ -13,6 +13,8 @@ export class OutOfBoundsError extends Error {
     }
 }
 
+const GROWTH_FACTOR = 2;
+
 export class View {
     private view: DataView;
     private arrayView: Uint8Array;
@@ -92,7 +94,7 @@ export class View {
         this.offset += length;
         if (this.offset > this.arrayView.byteLength)
             throw new OutOfBoundsError(this.offset, this.arrayView.byteLength);
-        return new Uint8Array(this.view.buffer.slice(this.offset - length, this.offset));
+        return new Uint8Array(this.buffer.slice(this.offset - length, this.offset));
     }
     public setFloat32(value: number): void {
         this.offset += 4;
@@ -156,7 +158,7 @@ export class View {
         }
 
         const oldBuffer = this.buffer;
-        this.buffer = new ArrayBuffer(size);
+        this.buffer = new ArrayBuffer(size * GROWTH_FACTOR);
         this.arrayView = new Uint8Array(this.buffer);
         this.arrayView.set(new Uint8Array(oldBuffer));
         this.view = new DataView(this.buffer);

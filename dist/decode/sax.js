@@ -2,8 +2,8 @@
 // This code is licensed under the MIT license. (see LICENSE for more details)
 import { Stack } from './stack';
 import { ErrorCode, ParseError } from './error';
-export class SAX {
-    constructor(max_depth) {
+var SAX = /** @class */ (function () {
+    function SAX(max_depth) {
         this.max_depth = max_depth;
         /**
          * The root element
@@ -18,59 +18,59 @@ export class SAX {
          */
         this.last_key = null;
     }
-    null() {
+    SAX.prototype.null = function () {
         return this.handle(null);
-    }
-    undefined() {
+    };
+    SAX.prototype.undefined = function () {
         return this.handle(undefined);
-    }
-    boolean(value) {
+    };
+    SAX.prototype.boolean = function (value) {
         return this.handle(value);
-    }
-    number(value) {
+    };
+    SAX.prototype.number = function (value) {
         return this.handle(value);
-    }
-    string(value) {
+    };
+    SAX.prototype.string = function (value) {
         return this.handle(value);
-    }
-    begin_object() {
+    };
+    SAX.prototype.begin_object = function () {
         this.stack.push("object", this.handle({}));
         if (this.stack.length > this.max_depth) {
             throw ParseError.build(ErrorCode.REACHED_MAX_NESTING_DEPTH, { depth: this.max_depth });
         }
-    }
-    key(value) {
-        const stack_top = this.stack.last();
+    };
+    SAX.prototype.key = function (value) {
+        var stack_top = this.stack.last();
         if (!stack_top) {
             throw ParseError.build(ErrorCode.EMPTY_STACK);
         }
         stack_top.object()[value] = null;
         this.last_key = value;
-    }
-    end_object() {
+    };
+    SAX.prototype.end_object = function () {
         if (this.stack.empty() || !this.stack.last().isObject()) {
             throw ParseError.build(ErrorCode.UNEXPECTED_OBJECT_END);
         }
         return this.stack.pop().object();
-    }
-    begin_array() {
+    };
+    SAX.prototype.begin_array = function () {
         this.stack.push("array", this.handle([]));
         if (this.stack.length > this.max_depth) {
             throw ParseError.build(ErrorCode.REACHED_MAX_NESTING_DEPTH, { depth: this.max_depth });
         }
-    }
-    end_array() {
+    };
+    SAX.prototype.end_array = function () {
         if (this.stack.empty() || !this.stack.last().isArray()) {
             throw ParseError.build(ErrorCode.UNEXPECTED_ARRAY_END);
         }
         return this.stack.pop().array();
-    }
-    handle(value) {
+    };
+    SAX.prototype.handle = function (value) {
         if (this.stack.length === 0 && this.root === null) {
             this.root = value;
             return value;
         }
-        const stack_top = this.stack.last();
+        var stack_top = this.stack.last();
         if (stack_top.isArray()) {
             stack_top.array().push(value);
             return value;
@@ -81,5 +81,7 @@ export class SAX {
             stack_top.object()[this.last_key] = value;
             return value;
         }
-    }
-}
+    };
+    return SAX;
+}());
+export { SAX };

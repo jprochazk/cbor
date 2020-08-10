@@ -3,29 +3,29 @@
 import { View } from '../common/view';
 import { getType, NUMERIC_LIMITS } from './util';
 import { WriteError, ErrorCode } from './error';
-const TEXT_ENCODER = new TextEncoder();
-export class Writer {
-    constructor(buffer) {
+var Writer = /** @class */ (function () {
+    function Writer(buffer) {
         this.view = new View(buffer);
+        this.textEncoder = new TextEncoder();
     }
-    finalize() {
+    Writer.prototype.finalize = function () {
         return this.view.slice(0, this.view.offset);
-    }
-    write(value) {
+    };
+    Writer.prototype.write = function (value) {
         switch (getType(value)) {
-            case "undefined": {
+            case 0: { // undefined
                 this.view.setUint8(0xF7);
                 break;
             }
-            case "null": {
+            case 1: { // null
                 this.view.setUint8(0xF6);
                 break;
             }
-            case "boolean": {
+            case 2: { // boolean
                 this.view.setUint8(value ? 0xF5 : 0xF4);
                 break;
             }
-            case "number": {
+            case 3: { // number
                 if (!Number.isSafeInteger(value)) {
                     // NaN / Infinity / -Infinity are encoded as Float32
                     // TODO: encode Infinity as Float16 instead (less bytes, same value)
@@ -66,9 +66,9 @@ export class Writer {
                     else {
                         // The conversions below encode the sign in the first
                         // byte, and the value is converted to a positive number.
-                        const positive_number = -1 - value;
+                        var positive_number = -1 - value;
                         if (value >= -24) {
-                            this.view.setUint8(0b00100000 + positive_number);
+                            this.view.setUint8(32 + positive_number);
                         }
                         else if (positive_number <= NUMERIC_LIMITS.UINT8) {
                             this.view.setUint8(0x38);
@@ -93,9 +93,9 @@ export class Writer {
                 }
                 break;
             }
-            case "string": {
-                const encoded = TEXT_ENCODER.encode(value);
-                const size = encoded.length;
+            case 4: { // string
+                var encoded = this.textEncoder.encode(value);
+                var size = encoded.length;
                 if (size <= 0x17) {
                     this.view.setUint8(0x60 + size);
                 }
@@ -112,7 +112,7 @@ export class Writer {
                     this.view.setUint32(size);
                 }
                 else {
-                    throw WriteError.build(ErrorCode.STRING_TOO_LARGE, { size });
+                    throw WriteError.build(ErrorCode.STRING_TOO_LARGE, { size: size });
                     /*
                     this.view.setUint8(0x7B);
                     this.view.setUint64(BigInt(size));
@@ -123,8 +123,8 @@ export class Writer {
                 }
                 break;
             }
-            case "array": {
-                const size = value.length;
+            case 5: { // array
+                var size = value.length;
                 if (size <= 0x17) {
                     this.view.setUint8(0x80 + size);
                 }
@@ -141,19 +141,20 @@ export class Writer {
                     this.view.setUint32(size);
                 }
                 else {
-                    throw WriteError.build(ErrorCode.ARRAY_TOO_LARGE, { size });
+                    throw WriteError.build(ErrorCode.ARRAY_TOO_LARGE, { size: size });
                     /*
                     this.view.setUint8(0x9B);
                     this.view.setUint64(BigInt(size));
                     */
                 }
-                for (const item of value) {
+                for (var _i = 0, value_1 = value; _i < value_1.length; _i++) {
+                    var item = value_1[_i];
                     this.write(item);
                 }
                 break;
             }
-            case "object": {
-                const size = Object.keys(value).length;
+            case 6: { // object
+                var size = Object.keys(value).length;
                 if (size <= 0x17) {
                     this.view.setUint8(0xA0 + size);
                 }
@@ -170,13 +171,14 @@ export class Writer {
                     this.view.setUint32(size);
                 }
                 else {
-                    throw WriteError.build(ErrorCode.OBJECT_TOO_LARGE, { size });
+                    throw WriteError.build(ErrorCode.OBJECT_TOO_LARGE, { size: size });
                     /*
                     this.view.setUint8(0xBB);
                     this.view.setUint64(BigInt(size));
                     */
                 }
-                for (const [k, v] of Object.entries(value)) {
+                for (var _a = 0, _b = Object.entries(value); _a < _b.length; _a++) {
+                    var _c = _b[_a], k = _c[0], v = _c[1];
                     this.write(k);
                     this.write(v);
                 }
@@ -185,5 +187,7 @@ export class Writer {
             default:
                 break;
         }
-    }
-}
+    };
+    return Writer;
+}());
+export { Writer };

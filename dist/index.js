@@ -2,25 +2,29 @@
 // This code is licensed under the MIT license. (see LICENSE for more details)
 import { decode } from './decode/index';
 import { encode } from './encode/index';
-export class CBOR {
+var CBOR = /** @class */ (function () {
+    function CBOR() {
+    }
     /**
      * Decodes a CBOR object into JSON
      *
      * @param buffer The bytes to decode
      * @param allowErrors Whether to throw errors (true) or return null on failure (false). False by default
      */
-    static decode(buffer, allowErrors = false) {
+    CBOR.decode = function (buffer, allowErrors) {
+        if (allowErrors === void 0) { allowErrors = false; }
         return decode(buffer, allowErrors);
-    }
+    };
     /**
      * Encodes a JSON value into CBOR
      *
      * @param data The value to encode
      * @param allowErrors Whether to throw errors (true) or return null on failure (false). False by default
      */
-    static encode(data, allowErrors = false) {
+    CBOR.encode = function (data, allowErrors) {
+        if (allowErrors === void 0) { allowErrors = false; }
         return encode(data, allowErrors);
-    }
+    };
     /**
      * Same as `CBOR.encode`, but writes to the supplied buffer.
      *
@@ -31,8 +35,11 @@ export class CBOR {
      * @param buffer The buffer to write to
      * @param allowErrors Whether to throw errors (true) or return null on failure (false). False by default
      */
-    static encodeInto(data, buffer, allowErrors = false) {
+    CBOR.encodeInto = function (data, buffer, allowErrors) {
+        if (allowErrors === void 0) { allowErrors = false; }
         return encode(data, allowErrors, buffer);
-    }
-}
+    };
+    return CBOR;
+}());
+export { CBOR };
 export default CBOR;
