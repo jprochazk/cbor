@@ -10,7 +10,7 @@ import { Writer } from './writer'
  * when faced with a write error instead of throwing the error.
  */
 export function encode(data: any, allowErrors: boolean, out?: ArrayBuffer) {
-    const buffer = out ?? new ArrayBuffer(50);
+    const buffer = out ?? new ArrayBuffer(1024);
     const writer = new Writer(buffer);
     if (!allowErrors) {
         try {

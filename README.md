@@ -13,7 +13,7 @@ This library is meant for use in the browser, but will also work in Node.
 > npm install cbor@npm:jprochazk/cbor
 ```
 
-The above command install the library under the `cbor` alias.
+The above command will install the library under the `cbor` alias.
 
 The API is very simple:
 
@@ -44,6 +44,23 @@ const encoded = CBOR.encodeInto(data, buffer);
 If you're always receiving the same data, make use of this!
 Encode your data once, measure the encoded length, and always
 pre-allocate this buffer size.
+
+### Benchmarks
+
+Speed was one of my main concerns when writing this library. The source code of the benchmark is available [here](https://github.com/jprochazk/cbor-benchmark). Here are the results:
+
+ _ _ _ _
+| CPU | CBOR.encode | CBOR.encodeInto | CBOR.decode |
+ _ _ _ _
+| i5-8600K | 2.8571 ms | 0.6223 ms | 1.1312 ms |
+ _ _ _ _
+| i7-8700K | 2.6581 ms | 0.6167 ms | 1.0576 ms |
+ _ _ _ _
+| i7-9850H | 2.1372 ms | 0.5422 ms | 0.8610 ms |
+ _ _ _ _
+| i7-4510U | 4.1245 ms | 0.9720 ms | 1.3037 ms |
+
+The JSON object used is ~13KB decoded, ~6KB encoded. This means 13MB/s decoding speed and around 2.3MB/s encoding. Most of the encoding here is spent allocating extra space, so if you encode into a sufficiently large pre-allocated buffer, you're looking at an encoding speed of nearly 8.5MB/s.
 
 ### Notes
 
