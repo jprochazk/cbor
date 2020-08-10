@@ -3,7 +3,7 @@
 import { decode } from './decode/index'
 import { encode } from './encode/index'
 
-export class CBOR {
+export default class CBOR {
 
     /**
      * Decodes a CBOR object into JSON

@@ -16,10 +16,10 @@
         "cbor",
         "sax"
     ],
-    "main": "dist/cbor.cjs.js",
-    "module": "dist/cbor.esm.js",
-    "browser": "dist/cbor.umd.js",
-    "types": "dist/cbor.d.ts",
+    "main": "dist/index.cjs.js",
+    "module": "dist/index.esm.js",
+    "browser": "dist/index.umd.js",
+    "types": "dist/index.d.ts",
     "scripts": {
         "test": "jest",
         "build": "rollup -c",

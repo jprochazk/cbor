@@ -13,9 +13,9 @@ export default [
             }),
         ],
         output: [
-            { name: "cbor", file: pkg.main, format: "cjs" },
-            { name: "cbor", file: pkg.module, format: "es" },
-            { name: "cbor", file: pkg.browser, format: "umd" },
+            { name: "index", file: pkg.main, format: "cjs" },
+            { name: "index", file: pkg.module, format: "es" },
+            { name: "index", file: pkg.browser, format: "umd" },
         ],
     },
 ];

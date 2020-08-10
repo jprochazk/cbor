@@ -1,7 +1,7 @@
 // Copyright (C) 2020 Jan Procházka. 
 // This code is licensed under the MIT license. (see LICENSE for more details)
 
-import { CBOR } from './../src/index';
+import CBOR from "../src/index";
 
 // TODO: write error cases
 
