@@ -124,21 +124,18 @@ describe("CBOR", function () {
         const bytes = new Uint8Array(c[1] as number[]);
         const json = c[2];
         it(`encode ${c[0]}`, function () {
-            {
-                const encoded = CBOR.encode(json, true);
-                if (null === encoded) return fail();
+            const encoded = CBOR.encode(json, true);
+            if (null === encoded) return fail();
 
-                expect(new Uint8Array(encoded))
-                    .toEqual(bytes);
-            }
+            expect(new Uint8Array(encoded))
+                .toEqual(bytes);
+        });
+        it(`encodeInto ${c[0]}`, function () {
+            const encoded = CBOR.encodeInto(new ArrayBuffer(bytes.byteLength), json, true);
+            if (null === encoded) return fail();
 
-            {
-                const encoded = CBOR.encodeInto(new ArrayBuffer(bytes.byteLength), json, true);
-                if (null === encoded) return fail();
-
-                expect(new Uint8Array(encoded))
-                    .toEqual(bytes);
-            }
+            expect(new Uint8Array(encoded))
+                .toEqual(bytes);
         });
     })
 });
