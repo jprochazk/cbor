@@ -10,6 +10,7 @@ module.exports = {
         "@typescript-eslint/ban-ts-comment": "off",
         "@typescript-eslint/no-namespace": "off",
         "@typescript-eslint/explicit-module-boundary-types": "off",
+        "@typescript-eslint/no-var-requires": "off",
         "no-debugger": "off",
         "no-fallthrough": "off",
         "no-constant-condition": "off",

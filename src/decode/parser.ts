@@ -1,10 +1,12 @@
 // Copyright (C) 2020 Jan Procházka.
 // This code is licensed under the MIT license. (see LICENSE for more details)
 
-import { View } from '../common/view'
+import { View } from 'common/view'
 import { ErrorCode, ParseError } from './error'
 import { SAX } from './sax'
+import { TextDecoder } from 'common/poly'
 
+const DECODER = new TextDecoder;
 export class Parser {
     private current_value: any;
     private readonly sax: SAX;
@@ -14,7 +16,7 @@ export class Parser {
         max_depth = 100
     ) {
         this.sax = new SAX(max_depth);
-        this.textDecoder = new TextDecoder();
+        this.textDecoder = DECODER;
     }
 
     public parse() {
