@@ -4,7 +4,6 @@
 import { View } from 'common/view';
 import { getType, NUMERIC_LIMITS } from './util';
 import { WriteError, ErrorCode } from './error';
-import { TextEncoder } from 'common/poly';
 
 const ENCODER = new TextEncoder;
 export class Writer {

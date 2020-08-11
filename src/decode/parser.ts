@@ -4,7 +4,6 @@
 import { View } from 'common/view'
 import { ErrorCode, ParseError } from './error'
 import { SAX } from './sax'
-import { TextDecoder } from 'common/poly'
 
 const DECODER = new TextDecoder;
 export class Parser {
