@@ -1,7 +1,7 @@
 
 
-const _encoder = globalThis.TextEncoder || require("util").TextEncoder;
-const _decoder = globalThis.TextDecoder || require("util").TextDecoder;
+const _encoder = TextEncoder || require("util").TextEncoder;
+const _decoder = TextDecoder || require("util").TextDecoder;
 
 export {
     _encoder as TextEncoder,
