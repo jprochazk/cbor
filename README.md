@@ -46,13 +46,13 @@ Speed was one of my main concerns when writing this library. Benchmark is availa
 | Chrome  | 5225 ops/s  | 8998 ops/s  | 9268 ops/s      |
 | Firefox | 20454 ops/s | 22323 ops/s | 22900 ops/s     |
 
-Results are on a i5-8600k intel processor. The JSON data used in the test is 2 KB decoded and 1.8 KB encoded. This means the library can decode at 13 MB/s and encode at 10 MB/s. 
+Results are on a i5-8600k intel processor. The JSON data used in the test is 2 KB decoded and 1.8 KB encoded. This means the library can decode at 13 MB/s and encode at 10 MB/s in Chrome, and around 2.5~4x as much in Firefox. 
 
 You can squeeze out a bit more performance if you use `CBOR.encodeInto` with a sufficiently large buffer. the `CBOR.encode` default is 1024 bytes, which should be enough for the vast majority of uses, but if you ever find yourself using more than that, utilize `CBOR.encodeInto`.
 
 ### Notes
 
-This library is meant for use in both Node & browsers.
+This library is meant for use in both Node & browsers. Minimum supported Node version is 11.
 
 There are a few things from the specification which are currently unimplemented:
 

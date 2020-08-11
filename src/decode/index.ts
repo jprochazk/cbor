@@ -1,8 +1,8 @@
 // Copyright (C) 2020 Jan Procházka. 
 // This code is licensed under the MIT license. (see LICENSE for more details)
 
-import { View } from '../common/view'
-import { Parser } from './parser'
+import { View } from "common/view"
+import { Parser } from "decode/parser"
 
 /**
  * Decodes a CBOR object into JSON
