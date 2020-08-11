@@ -1,8 +1,8 @@
 // Copyright (C) 2020 Jan Procházka.
 // This code is licensed under the MIT license. (see LICENSE for more details)
 
-import { Stack } from './stack'
-import { ErrorCode, ParseError } from './error'
+import { Stack } from "decode/stack"
+import { ErrorCode, ParseError } from "decode/error"
 
 export class SAX {
     /**

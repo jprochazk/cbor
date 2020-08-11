@@ -1,9 +1,8 @@
 // Copyright (C) 2020 Jan Procházka.
 // This code is licensed under the MIT license. (see LICENSE for more details)
 
-import { View } from 'common/view';
-import { getType, NUMERIC_LIMITS } from './util';
-import { WriteError, ErrorCode } from './error';
+import { View } from "common/view";
+import { WriteError, ErrorCode } from "encode/error";
 
 const ENCODER = new TextEncoder;
 export class Writer {
@@ -22,7 +21,7 @@ export class Writer {
     }
 
     write(value: any) {
-        switch (getType(value)) {
+        switch (this.getType(value)) {
             case 0: { // undefined
                 this.view.setUint8(0xF7);
                 break;
@@ -42,7 +41,7 @@ export class Writer {
                 if (!Number.isSafeInteger(value)) {
                     // NaN / Infinity / -Infinity are encoded as Float32
                     // TODO: encode Infinity as Float16 instead (less bytes, same value)
-                    if (isNaN(value) || !isFinite(value) || (-NUMERIC_LIMITS.FLOAT32 <= value && value <= NUMERIC_LIMITS.FLOAT32)) {
+                    if (isNaN(value) || !isFinite(value) || (-8388607 <= value && value <= 8388607)) {
                         this.view.setUint8(0xFA);
                         this.view.setFloat32(value);
                     } else {
@@ -54,15 +53,15 @@ export class Writer {
                         if (value <= 0x17) {
                             this.view.setUint8(value);
                         }
-                        else if (value <= NUMERIC_LIMITS.UINT8) {
+                        else if (value <= 255) {
                             this.view.setUint8(0x18);
                             this.view.setUint8(value);
                         }
-                        else if (value <= NUMERIC_LIMITS.UINT16) {
+                        else if (value <= 65535) {
                             this.view.setUint8(0x19);
                             this.view.setUint16(value);
                         }
-                        else if (value <= NUMERIC_LIMITS.UINT32) {
+                        else if (value <= 4294967295) {
                             this.view.setUint8(0x1A);
                             this.view.setUint32(value);
                         }
@@ -81,15 +80,15 @@ export class Writer {
                         if (value >= -24) {
                             this.view.setUint8(0b00100000 + (positive_number as number));
                         }
-                        else if (positive_number <= NUMERIC_LIMITS.UINT8) {
+                        else if (positive_number <= 255) {
                             this.view.setUint8(0x38);
                             this.view.setUint8(positive_number as number);
                         }
-                        else if (positive_number <= NUMERIC_LIMITS.UINT16) {
+                        else if (positive_number <= 65535) {
                             this.view.setUint8(0x39);
                             this.view.setUint16(positive_number as number);
                         }
-                        else if (positive_number <= NUMERIC_LIMITS.UINT32) {
+                        else if (positive_number <= 4294967295) {
                             this.view.setUint8(0x3A);
                             this.view.setUint32(positive_number as number);
                         }
@@ -111,15 +110,15 @@ export class Writer {
                 if (size <= 0x17) {
                     this.view.setUint8(0x60 + size);
                 }
-                else if (size <= NUMERIC_LIMITS.UINT8) {
+                else if (size <= 255) {
                     this.view.setUint8(0x78);
                     this.view.setUint8(size);
                 }
-                else if (size <= NUMERIC_LIMITS.UINT16) {
+                else if (size <= 65535) {
                     this.view.setUint8(0x79);
                     this.view.setUint16(size);
                 }
-                else if (size <= NUMERIC_LIMITS.UINT32) {
+                else if (size <= 4294967295) {
                     this.view.setUint8(0x7A);
                     this.view.setUint32(size);
                 }
@@ -142,15 +141,15 @@ export class Writer {
                 if (size <= 0x17) {
                     this.view.setUint8(0x80 + size);
                 }
-                else if (size <= NUMERIC_LIMITS.UINT8) {
+                else if (size <= 255) {
                     this.view.setUint8(0x98);
                     this.view.setUint8(size);
                 }
-                else if (size <= NUMERIC_LIMITS.UINT16) {
+                else if (size <= 65535) {
                     this.view.setUint8(0x99);
                     this.view.setUint16(size);
                 }
-                else if (size <= NUMERIC_LIMITS.UINT32) {
+                else if (size <= 4294967295) {
                     this.view.setUint8(0x9A);
                     this.view.setUint32(size);
                 }
@@ -173,15 +172,15 @@ export class Writer {
                 if (size <= 0x17) {
                     this.view.setUint8(0xA0 + size);
                 }
-                else if (size <= NUMERIC_LIMITS.UINT8) {
+                else if (size <= 255) {
                     this.view.setUint8(0xB8);
                     this.view.setUint8(size);
                 }
-                else if (size <= NUMERIC_LIMITS.UINT16) {
+                else if (size <= 65535) {
                     this.view.setUint8(0xB9);
                     this.view.setUint16(size);
                 }
-                else if (size <= NUMERIC_LIMITS.UINT32) {
+                else if (size <= 4294967295) {
                     this.view.setUint8(0xBA);
                     this.view.setUint32(size);
                 }
@@ -202,6 +201,29 @@ export class Writer {
 
             default:
                 break;
+        }
+    }
+
+    getType(value: any): number {
+        switch (true) {
+            case (typeof value === "undefined"):
+                return 0;
+            case (value === null):
+                return 1;
+            case (typeof value === "boolean"):
+                return 2;
+            case (typeof value === "number"):
+                return 3;
+            case (typeof value === "bigint"):
+                throw WriteError.build(ErrorCode.UNSUPPORTED_BIGINT);
+            case (typeof value === "string"):
+                return 4;
+            case (Array.isArray(value)):
+                return 5;
+            case (typeof value === "object"):
+                return 6;
+            default:
+                throw WriteError.build(ErrorCode.UNEXPECTED_TOKEN, { token: value });
         }
     }
 }

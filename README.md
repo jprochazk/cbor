@@ -52,7 +52,7 @@ You can squeeze out a bit more performance if you use `CBOR.encodeInto` with a s
 
 ### Notes
 
-This library is meant for use in both Node & browsers.
+This library is meant for use in both Node & browsers. Minimum supported Node version is 11.
 
 There are a few things from the specification which are currently unimplemented:
 

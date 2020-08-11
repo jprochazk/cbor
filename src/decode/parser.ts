@@ -1,9 +1,9 @@
 // Copyright (C) 2020 Jan Procházka.
 // This code is licensed under the MIT license. (see LICENSE for more details)
 
-import { View } from 'common/view'
-import { ErrorCode, ParseError } from './error'
-import { SAX } from './sax'
+import { View } from "common/view"
+import { ErrorCode, ParseError } from "decode/error"
+import { SAX } from "decode/sax"
 
 const DECODER = new TextDecoder;
 export class Parser {
