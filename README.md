@@ -33,7 +33,7 @@ The library is targeted for both Node and Browsers using NPM:
 ```
 > npm install cbor@npm:jprochazk/cbor
 ```
-This install the library under the `cbor` alias.
+This installs the library under the `cbor` alias.
 
 ```js
 // as CommonJS
