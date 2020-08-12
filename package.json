@@ -1,6 +1,6 @@
 {
     "name": "@jprochazk/cbor",
-    "version": "0.4.5",
+    "version": "0.4.6",
     "description": "Partial implementation of RFC 7049 (CBOR)",
     "author": "Jan Procházka",
     "license": "MIT",
