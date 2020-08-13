@@ -47,6 +47,8 @@ export class SAX {
     begin_object() {
         this.stack.push("object", this.handle({}));
 
+        // js engines differ in their max nesting depth, so it's impossible to test this consistently
+        /* istanbul ignore next */
         if (this.stack.length > this.max_depth) {
             throw ParseError.build(ErrorCode.REACHED_MAX_NESTING_DEPTH, { depth: this.max_depth });
         }
@@ -54,6 +56,8 @@ export class SAX {
 
     key(value: string) {
         const stack_top = this.stack.last();
+        // this is only ever called after begin_object()
+        /* istanbul ignore next */
         if (!stack_top) {
             throw ParseError.build(ErrorCode.EMPTY_STACK);
         }
@@ -63,6 +67,9 @@ export class SAX {
     }
 
     end_object() {
+        // start_array is always called before end_array
+        // this would be a programmer error
+        /* istanbul ignore next */
         if (this.stack.empty() || !this.stack.last().isObject()) {
             throw ParseError.build(ErrorCode.UNEXPECTED_OBJECT_END);
         }
@@ -73,12 +80,16 @@ export class SAX {
     begin_array() {
         this.stack.push("array", this.handle([]));
 
+        // js engines differ in their max nesting depth, so it's impossible to test this consistently
+        /* istanbul ignore next */
         if (this.stack.length > this.max_depth) {
             throw ParseError.build(ErrorCode.REACHED_MAX_NESTING_DEPTH, { depth: this.max_depth });
         }
     }
 
     end_array() {
+        // same as above with end_object
+        /* istanbul ignore next */
         if (this.stack.empty() || !this.stack.last().isArray()) {
             throw ParseError.build(ErrorCode.UNEXPECTED_ARRAY_END);
         }
@@ -98,6 +109,8 @@ export class SAX {
             return value;
         }
         else if (stack_top.isObject()) {
+            // practically unreachable
+            /* istanbul ignore next */
             if (!this.last_key) throw ParseError.build(ErrorCode.UNEXPECTED_VALUE);
             stack_top.object()[this.last_key] = value;
             return value;

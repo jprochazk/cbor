@@ -22,7 +22,6 @@ export class Parser {
         // see https://tools.ietf.org/html/rfc7049#appendix-B to understand these values
         this.get();
         switch (true) {
-            case (this.current_value < 0x00): throw ParseError.build(ErrorCode.UNEXPECTED_EOF, { offset: this.view.offset });
             case (this.current_value <= 0x17):
                 return this.sax.number(this.current_value);
             case (this.current_value === 0x18):
@@ -76,7 +75,7 @@ export class Parser {
     }
 
     private get_string(): string {
-        let len: number | bigint = -1;
+        let len = -1;
         switch (true) {
             case (this.current_value <= 0x77):
                 len = this.current_value & 0b00011111;
@@ -84,32 +83,32 @@ export class Parser {
             case (this.current_value === 0x78):
                 len = this.view.getUint8();
                 break;
+            // these all work the same way
+            /* istanbul ignore next */
             case (this.current_value === 0x79):
                 len = this.view.getUint16();
                 break;
+            /* istanbul ignore next */
             case (this.current_value === 0x7A):
                 len = this.view.getUint32();
                 break;
             case (this.current_value === 0x7B):
-                len = this.view.getUint64();
-                break;
+                throw ParseError.build(ErrorCode.UNSUPPORTED_64_BIT);
             case (this.current_value === 0x7F): break;
-            default:
-                throw ParseError.build(ErrorCode.WRONG_STRING_FORMAT, { token: `0x${this.current_value.toString(16).toUpperCase()}` });
         }
         const result: string[] = [];
         if (len > -1) {
-            if (typeof len === "bigint") {
-                const bytes = [];
-                for (let i = 0; i < len; i++) {
-                    bytes.push(this.get());
-                }
-                result.push(this.textDecoder.decode(new Uint8Array(bytes)));
-            } else {
-                const bytes = this.view.getBytes(len);
-                if (bytes.length > 0)
-                    result.push(this.textDecoder.decode(bytes));
-            }
+            //if (typeof len === "bigint") {
+            //    const bytes = [];
+            //    for (let i = 0; i < len; i++) {
+            //        bytes.push(this.get());
+            //    }
+            //    result.push(this.textDecoder.decode(new Uint8Array(bytes)));
+            //} else {
+            const bytes = this.view.getBytes(len);
+            if (bytes.length > 0)
+                result.push(this.textDecoder.decode(bytes));
+            //}
         } else {
             const chunks = [];
             while (this.get() !== 0xFF) {
@@ -123,7 +122,7 @@ export class Parser {
     private get_array(): any[] {
         this.sax.begin_array();
 
-        let len: number | bigint = -1;
+        let len = -1;
         switch (true) {
             case (this.current_value <= 0x97):
                 len = this.current_value & 0b00011111;
@@ -131,18 +130,19 @@ export class Parser {
             case (this.current_value === 0x98):
                 len = this.view.getUint8();
                 break;
+            // these all work the same way
+            /* istanbul ignore next */
             case (this.current_value === 0x99):
                 len = this.view.getUint16();
                 break;
+            // these all work the same way
+            /* istanbul ignore next */
             case (this.current_value === 0x9A):
                 len = this.view.getUint32();
                 break;
             case (this.current_value === 0x9B):
-                len = this.view.getUint64();
-                break;
+                throw ParseError.build(ErrorCode.UNSUPPORTED_64_BIT);
             case (this.current_value === 0x9F): break;
-            default:
-                throw ParseError.build(ErrorCode.UNEXPECTED_TOKEN, { token: `0x${this.current_value.toString(16).toUpperCase()}` })
         }
         if (len > -1) {
             for (let i = 0; i < len; i++) {
@@ -159,7 +159,7 @@ export class Parser {
     private get_object(): { [index: string]: any } {
         this.sax.begin_object();
 
-        let len: number | bigint = -1;
+        let len = -1;
         switch (true) {
             case (this.current_value <= 0xB7):
                 len = this.current_value & 0b00011111;
@@ -167,15 +167,18 @@ export class Parser {
             case (this.current_value === 0xB8):
                 len = this.view.getUint8();
                 break;
+            // these all work the same way
+            /* istanbul ignore next */
             case (this.current_value === 0xB9):
                 len = this.view.getUint16();
                 break;
+            // these all work the same way
+            /* istanbul ignore next */
             case (this.current_value === 0xBA):
                 len = this.view.getUint32();
                 break;
             case (this.current_value === 0xBB):
-                len = this.view.getUint64();
-                break;
+                throw ParseError.build(ErrorCode.UNSUPPORTED_64_BIT);
         }
         if (len > -1) {
             for (let i = 0; i < len; i++) {

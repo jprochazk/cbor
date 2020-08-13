@@ -20,10 +20,10 @@ export class WriteError extends Error {
         return `ParseError: ${this.what}`;
     }
 
-    public static build(code: ErrorCode, info?: { [index: string]: any }) {
+    public static build(code: ErrorCode, info: { [index: string]: any } = {}) {
         switch (code) {
             case ErrorCode.UNEXPECTED_TOKEN:
-                return new WriteError(`Unexpected token: ${info!.token.toString()}`);
+                return new WriteError(`Unexpected token: ${info!.token}`);
             case ErrorCode.UNSUPPORTED_BIGINT:
                 return new WriteError(`BigInt is unsupported`);
             case ErrorCode.STRING_TOO_LARGE:

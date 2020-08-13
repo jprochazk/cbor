@@ -7,10 +7,6 @@ export class OutOfBoundsError extends Error {
         super(`View offset out of bounds: ${offset} > ${length}`);
         this.what = `View offset out of bounds: ${offset} > ${length}`;
     }
-
-    toString() {
-        return `OutOfBoundsError: ${this.what}`;
-    }
 }
 
 const GROWTH_FACTOR = 2;
@@ -42,24 +38,29 @@ export class View {
             throw new OutOfBoundsError(this.offset, this.arrayView.byteLength);
         return this.view.getFloat64(this.offset - 8, false);
     }
+    // these getter aren't ever actually used in the code
+    /* istanbul ignore next */
     public getInt8(): number {
         this.offset += 1;
         if (this.offset > this.arrayView.byteLength)
             throw new OutOfBoundsError(this.offset, this.arrayView.byteLength);
         return this.view.getInt8(this.offset - 1);
     }
+    /* istanbul ignore next */
     public getInt16(): number {
         this.offset += 2;
         if (this.offset > this.arrayView.byteLength)
             throw new OutOfBoundsError(this.offset, this.arrayView.byteLength);
         return this.view.getInt16(this.offset - 2, false);
     }
+    /* istanbul ignore next */
     public getInt32(): number {
         this.offset += 4;
         if (this.offset > this.arrayView.byteLength)
             throw new OutOfBoundsError(this.offset, this.arrayView.byteLength);
         return this.view.getInt32(this.offset - 4, false);
     }
+    /* istanbul ignore next */
     public getInt64(): bigint {
         this.offset += 8;
         if (this.offset > this.arrayView.byteLength)
@@ -84,6 +85,8 @@ export class View {
             throw new OutOfBoundsError(this.offset, this.arrayView.byteLength);
         return this.view.getUint32(this.offset - 4, false);
     }
+    // 64-bit unsupported for now
+    /* istanbul ignore next */
     public getUint64(): number | bigint {
         this.offset += 8;
         if (this.offset > this.arrayView.byteLength)
@@ -106,21 +109,26 @@ export class View {
         this.resize(this.offset);
         this.view.setFloat64(this.offset - 8, value, false);
     }
+    // these setters are never actually used
+    /* istanbul ignore next */
     public setInt8(value: number): void {
         this.offset += 1;
         this.resize(this.offset);
         this.view.setInt8(this.offset - 1, value);
     }
+    /* istanbul ignore next */
     public setInt16(value: number): void {
         this.offset += 2;
         this.resize(this.offset);
         this.view.setInt16(this.offset - 2, value, false);
     }
+    /* istanbul ignore next */
     public setInt32(value: number): void {
         this.offset += 4;
         this.resize(this.offset);
         this.view.setInt32(this.offset - 4, value, false);
     }
+    /* istanbul ignore next */
     public setInt64(value: bigint): void {
         this.offset += 8;
         this.resize(this.offset);
@@ -141,6 +149,8 @@ export class View {
         this.resize(this.offset);
         this.view.setUint32(this.offset - 4, value, false);
     }
+    // 64-bit is unsupported
+    /* istanbul ignore next */
     public setUint64(value: bigint): void {
         this.offset += 8;
         this.resize(this.offset);

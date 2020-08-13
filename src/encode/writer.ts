@@ -118,6 +118,8 @@ export class Writer {
                     this.view.setUint8(0x79);
                     this.view.setUint16(size);
                 }
+                // including this in tests would 
+                // LCOV_EXCL_START
                 else if (size <= 4294967295) {
                     this.view.setUint8(0x7A);
                     this.view.setUint32(size);
@@ -129,6 +131,7 @@ export class Writer {
                     this.view.setUint64(BigInt(size));
                     */
                 }
+                // LCOV_EXCL_STOP
 
                 if (size > 0) {
                     this.view.setBytes(encoded);
