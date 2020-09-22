@@ -57,22 +57,16 @@ Or included in the page as a static script from the `unkpg` CDN:
 
 ### Benchmarks
 
-Speed was one of my main concerns when writing this library. Benchmark is available [here](https://jsbench.me/krkdop8101/1).
+Benchmark is available [here](https://jsbench.me/krkdop8101/1).
 
 | Browser | CBOR.decode | CBOR.encode | CBOR.encodeInto |
 | :------ | :---------- | :---------- | :-------------- |
 | Chrome  | 5225 ops/s  | 8998 ops/s  | 9268 ops/s      |
 | Firefox | 20454 ops/s | 22323 ops/s | 22900 ops/s     |
 
-Results are on a i5-8600k intel processor. Your mileage may vary. The JSON data used in the test is 2 KB decoded and 1.8 KB encoded. I specifically chose this data, because it encodes badly (lots of nested objects with only a single property).
-
-The benchmark suggests the library can decode at 13 MB/s and encode at 10 MB/s in Chrome, and around 2.5~4x as much in Firefox. I haven't run the benchmarks in Safari, because I don't have access to any Apple computers.
+Results are on a i5-8600k intel processor. Your mileage may vary. The JSON data used in the test is 2 KB decoded and 1.8 KB encoded. I specifically chose this data, because it encodes badly (lots of nested objects with only a single property). The benchmark suggests the library can encode/decode around 10 MB/s in Chrome and around 50 MB/s in Firefox. Hopefully, these are meaningful results.
 
 ### Notes
-
-Because of the ArrayBuffer allocation strategy, the CBOR.encode method is pretty much as fast as CBOR.encodeInto. However, you can still find performance gains when encoding very large objects by preallocating a much larger buffer, or when encoding very small objects (<128 bytes) by allocating a smaller buffer.
-
-Minimum supported Node version is 11.
 
 There are a few things from the specification which are currently unimplemented:
 
