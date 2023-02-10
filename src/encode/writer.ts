@@ -21,23 +21,23 @@ export class Writer {
     }
 
     write(value: any) {
-        switch (this.getType(value)) {
-            case 0: { // undefined
+        switch (true) {
+            case (typeof value === "undefined"): { // undefined
                 this.view.setUint8(0xF7);
                 break;
             }
 
-            case 1: { // null
+            case (value === null): { // null
                 this.view.setUint8(0xF6);
                 break;
             }
 
-            case 2: { // boolean
+            case (typeof value === "boolean"): { // boolean
                 this.view.setUint8(value ? 0xF5 : 0xF4);
                 break;
             }
 
-            case 3: { // number
+            case (typeof value === "number"): { // number
                 if (!Number.isSafeInteger(value)) {
                     // NaN / Infinity / -Infinity are encoded as Float32
                     // TODO: encode Infinity as Float16 instead (less bytes, same value)
@@ -103,8 +103,11 @@ export class Writer {
                 }
                 break;
             }
+            case (typeof value === "bigint"): { // bigint
+                throw WriteError.build(ErrorCode.UNSUPPORTED_BIGINT);
+            }
 
-            case 4: { // string
+            case (typeof value === "string"): { // string
                 const encoded = this.textEncoder.encode(value);
                 const size = encoded.length;
                 if (size <= 0x17) {
@@ -139,7 +142,7 @@ export class Writer {
                 break;
             }
 
-            case 5: { // array
+            case (Array.isArray(value)): { // array
                 const size = value.length;
                 if (size <= 0x17) {
                     this.view.setUint8(0x80 + size);
@@ -170,7 +173,37 @@ export class Writer {
                 break;
             }
 
-            case 6: { // object
+            case (isBuffer(value) || isBufferView(value)): { // byte string
+                const size = (value as ArrayBuffer | BufferView).byteLength;
+                if (size <= 0x17) {
+                    this.view.setUint8(0x40 + size);
+                }
+                else if (size <= 255) {
+                    this.view.setUint8(0x58);
+                    this.view.setUint8(size);
+                }
+                else if (size <= 65535) {
+                    this.view.setUint8(0x59);
+                    this.view.setUint16(size);
+                }
+                else if (size <= 4294967295) {
+                    this.view.setUint8(0x5A);
+                    this.view.setUint32(size);
+                }
+                else {
+                    throw WriteError.build(ErrorCode.OBJECT_TOO_LARGE, { size });
+                    /*
+                    this.view.setUint8(0xBB);
+                    this.view.setUint64(BigInt(size));
+                    */
+                }
+
+                this.view.setBytes(new Uint8Array(value));
+
+                break;
+            }
+
+            case (typeof value === "object"): { // object
                 const size = Object.keys(value).length;
                 if (size <= 0x17) {
                     this.view.setUint8(0xA0 + size);
@@ -229,4 +262,14 @@ export class Writer {
                 throw WriteError.build(ErrorCode.UNEXPECTED_TOKEN, { token: value });
         }
     }
+}
+
+function isBuffer(value: any): value is ArrayBuffer {
+    return value instanceof ArrayBuffer
+}
+
+type BufferView = Uint8Array | Uint16Array | Uint32Array | Int8Array | Int16Array | Int32Array | Float32Array | Float64Array;
+
+function isBufferView(value: any): value is BufferView {
+    return typeof value === "object" && "buffer" in value && (value as BufferView).buffer instanceof ArrayBuffer
 }

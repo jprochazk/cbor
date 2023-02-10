@@ -45,7 +45,7 @@ export class Parser {
                 throw ParseError.build(ErrorCode.UNSUPPORTED_64_BIT);
             //return this.sax.number(-(add_number_bigint(1, this.view.getUint64())) as unknown as number)
             case (this.current_value <= 0x5F):
-                throw ParseError.build(ErrorCode.UNSUPPORTED_BYTE_STRING);
+                return this.sax.byte_string(this.get_byte_string());
             case (this.current_value <= 0x7F):
                 return this.sax.string(this.get_string());
             case (this.current_value <= 0x9F):
@@ -117,6 +117,61 @@ export class Parser {
             result.push(...chunks);
         }
         return result.join("");
+    }
+
+    private get_byte_string(): Uint8Array {
+        let len = -1;
+        switch (true) {
+            case (this.current_value <= 0x57):
+                len = this.current_value & 0b00011111;
+                break;
+            case (this.current_value === 0x58):
+                len = this.view.getUint8();
+                break;
+            // these all work the same way
+            /* istanbul ignore next */
+            case (this.current_value === 0x59):
+                len = this.view.getUint16();
+                break;
+            /* istanbul ignore next */
+            case (this.current_value === 0x5A):
+                len = this.view.getUint32();
+                break;
+            case (this.current_value === 0x5B):
+                throw ParseError.build(ErrorCode.UNSUPPORTED_64_BIT);
+            case (this.current_value === 0x5F): break;
+        }
+        let total_length = 0;
+        const result: Uint8Array[] = [];
+        if (len > -1) {
+            //if (typeof len === "bigint") {
+            //    const bytes = [];
+            //    for (let i = 0; i < len; i++) {
+            //        bytes.push(this.get());
+            //    }
+            //    result.push(this.textDecoder.decode(new Uint8Array(bytes)));
+            //} else {
+            const bytes = this.view.getBytes(len);
+            if (bytes.length > 0) {
+                result.push(bytes);
+                total_length += bytes.length;
+            }
+            //}
+        } else {
+            while (this.get() !== 0xFF) {
+                const chunk = this.get_byte_string();
+                result.push(chunk);
+                total_length += chunk.length;
+            }
+        }
+        const temp = new Uint8Array(new ArrayBuffer(total_length));
+        let offset = 0;
+        for (let i = 0; i < result.length; ++i) {
+            const chunk = result[i];
+            temp.set(chunk, offset);
+            offset += chunk.byteLength;
+        }
+        return temp;
     }
 
     private get_array(): any[] {

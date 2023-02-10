@@ -44,6 +44,10 @@ export class SAX {
         return this.handle(value);
     }
 
+    byte_string(value: Uint8Array): Uint8Array {
+        return this.handle(value)
+    }
+
     begin_object() {
         this.stack.push("object", this.handle({}));
 

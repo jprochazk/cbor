@@ -62,6 +62,9 @@ const decode_cases = [
     ["9007199254740994", [251, 67, 64, 0, 0, 0, 0, 0, 1], 9007199254740994],
     ["1.0e+300", [251, 126, 55, 228, 60, 136, 0, 117, 156], 1e+300],
     ["-9007199254740994", [251, 195, 64, 0, 0, 0, 0, 0, 1], -9007199254740994],
+    ["h''", [0x40], new Uint8Array()],
+    ["h'01020304'", [68, 1, 2, 3, 4], new Uint8Array([1, 2, 3, 4])],
+    ["(_ h'0102', h'030405')", [95, 66, 1, 2, 67, 3, 4, 5, 255], new Uint8Array([1, 2, 3, 4, 5])],
 ];
 
 const encode_cases = [
@@ -110,6 +113,8 @@ const encode_cases = [
     ["9007199254740994", [251, 67, 64, 0, 0, 0, 0, 0, 1], 9007199254740994],
     ["1.0e+300", [251, 126, 55, 228, 60, 136, 0, 117, 156], 1e+300],
     ["-9007199254740994", [251, 195, 64, 0, 0, 0, 0, 0, 1], -9007199254740994],
+    ["h''", [0x40], new Uint8Array()],
+    ["h'01020304'", [68, 1, 2, 3, 4], new Uint8Array([1, 2, 3, 4])],
 ];
 
 describe("CBOR", function () {
@@ -191,7 +196,7 @@ const parse_error_cases = [
     [`64-bit size string unsupported`, [123], ParseError.build(ParseErrorCode.UNSUPPORTED_64_BIT)],
     [`64-bit size array unsupported`, [155], ParseError.build(ParseErrorCode.UNSUPPORTED_64_BIT)],
     [`64-bit size object unsupported`, [187], ParseError.build(ParseErrorCode.UNSUPPORTED_64_BIT)],
-    [`byte-string unsupported`, [95], ParseError.build(ParseErrorCode.UNSUPPORTED_BYTE_STRING)],
+    // [`byte-string unsupported`, [64], ParseError.build(ParseErrorCode.UNSUPPORTED_BYTE_STRING)],
     [`half unsupported`, [249], ParseError.build(ParseErrorCode.UNSUPPORTED_HALF)],
 ];
 
