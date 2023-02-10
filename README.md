@@ -70,7 +70,6 @@ Results are on a i5-8600k intel processor. Your mileage may vary. The JSON data 
 
 There are a few things from the specification which are currently unimplemented:
 
--   Byte strings
 -   Tags, and the items they represent:
     -   date/time, bignum/bigfloat as byte string, and others
 -   16-bit float (IEEE754 binary16)
